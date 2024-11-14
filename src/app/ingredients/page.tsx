@@ -6,6 +6,16 @@ import { Input } from "@/components/ui/input";
 import { AceternityCard } from "@/components/ui/aceternity-card";
 import { AceternityButton } from "@/components/ui/aceternity-button";
 import { useRouter } from "next/navigation";
+<<<<<<< HEAD
+=======
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+>>>>>>> e6e4d5d71b005ecd99c8110e8c23c1c26b65a4b6
 
 interface Recipe {
   id: number
@@ -24,6 +34,10 @@ export default function Home() {
   const router = useRouter();
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
+<<<<<<< HEAD
+=======
+  const [selectedCategory, setSelectedCategory] = useState("");
+>>>>>>> e6e4d5d71b005ecd99c8110e8c23c1c26b65a4b6
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -52,6 +66,10 @@ export default function Home() {
   };
 
   const handleProceed = () => {
+<<<<<<< HEAD
+=======
+    // TODO: Implement API call with ingredients
+>>>>>>> e6e4d5d71b005ecd99c8110e8c23c1c26b65a4b6
     console.log("Proceeding with ingredients:", ingredients);
     router.push("./recipes");
   };
@@ -76,9 +94,21 @@ export default function Home() {
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+<<<<<<< HEAD
               aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+=======
+              aria-label={
+                darkMode ? "Switch to light mode" : "Switch to dark mode"
+              }
+            >
+              {darkMode ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+>>>>>>> e6e4d5d71b005ecd99c8110e8c23c1c26b65a4b6
             </button>
           </div>
         </div>
@@ -91,7 +121,12 @@ export default function Home() {
               What&apos;s in your kitchen?
             </h2>
             <p className="text-gray-600 dark:text-gray-300 transition-colors duration-200">
+<<<<<<< HEAD
               Enter your ingredients and we&apos;ll suggest delicious recipes you can make.
+=======
+              Enter your ingredients and we&apos;ll suggest delicious recipes
+              you can make.
+>>>>>>> e6e4d5d71b005ecd99c8110e8c23c1c26b65a4b6
             </p>
           </div>
 
@@ -101,6 +136,21 @@ export default function Home() {
                 Enter Ingredients
               </h3>
               <div className="space-y-4">
+<<<<<<< HEAD
+=======
+                <Select onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vegetables">Vegetables</SelectItem>
+                    <SelectItem value="fruits">Fruits</SelectItem>
+                    <SelectItem value="meats">Meats</SelectItem>
+                    <SelectItem value="dairy">Dairy</SelectItem>
+                    <SelectItem value="grains">Grains</SelectItem>
+                  </SelectContent>
+                </Select>
+>>>>>>> e6e4d5d71b005ecd99c8110e8c23c1c26b65a4b6
                 <div className="flex gap-2">
                   <Input
                     placeholder="Enter an ingredient"
