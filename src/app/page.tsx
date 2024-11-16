@@ -1,102 +1,154 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { useState, useEffect } from 'react';
+import { motion } from "framer-motion";
 import { LampContainer } from "@/components/ui/lamp";
-import { Timeline } from "@/components/ui/timeline";
 import { AceternityButton } from "@/components/ui/aceternity-button";
-import { Utensils } from 'lucide-react';
+import { AceternityCard } from "@/components/ui/aceternity-card";
+import { useRouter } from "next/navigation";
+import { Logo } from "@/components/ui/logo";
+import { MovingBorder } from "@/components/ui/moving-border";
 
-export default function LandingPage() {
+const LandingPage: React.FC = () => {
   const router = useRouter();
   const [text, setText] = useState('');
-  const description = 'Transform your kitchen ingredients into delicious recipes...';
+  const description = "Don't Waste It, Recify It!";
 
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
-      setText((prev) => prev + description[index]);
-      index++;
-      if (index === description.length) {
+      if (index < description.length) {
+        setText(prev => description.slice(0, index + 1));
+        index++;
+      } else {
         clearInterval(interval);
       }
     }, 100);
+
     return () => clearInterval(interval);
   }, []);
 
-  const timelineItems = [
+  const features = [
     {
-      title: "Smart Recipe Discovery",
-      description: "Enter ingredients you have, and let Recify suggest delicious recipes. Our intelligent system matches your available ingredients with possible recipes, making meal planning effortless.",
-      icon: "🔍"
+      title: "Smart Recipe Matching",
+      description: "Find perfect recipes based on your available ingredients",
+      icon: "🥘"
     },
     {
-      title: "Organized Ingredient Management",
-      description: "Easily categorize and manage your ingredients with our intuitive interface. Sort by vegetables, fruits, meats, dairy, or grains to keep everything organized.",
+      title: "Step-by-Step Guide",
+      description: "Follow easy cooking instructions with detailed steps",
       icon: "📝"
     },
     {
-      title: "Instant Recipe Suggestions",
-      description: "Get immediate recipe recommendations based on your ingredients. Each recipe comes with detailed instructions and a complete ingredient list.",
-      icon: "⚡"
-    },
-    {
-      title: "Interactive Recipe Experience",
-      description: "Explore recipes with our interactive cards, view detailed steps, and follow along with clear instructions to create your perfect meal.",
-      icon: "👨‍🍳"
-    },
-    {
-      title: "Reduce Food Waste",
-      description: "Make the most of what's in your kitchen. Recify helps you use ingredients you already have, reducing food waste and saving money.",
-      icon: "🌱"
+      title: "Save Favorites",
+      description: "Keep track of your favorite recipes for quick access",
+      icon: "⭐"
     }
   ];
 
+  const scrollToFeatures = () => {
+    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="relative">
-      <div className="h-screen w-full dark:bg-black bg-white dark:bg-grid-white/[0.2] bg-grid-black/[0.2] relative flex items-center justify-center">
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <div className="h-screen w-full relative">
         <LampContainer>
           <motion.div
-            initial={{ opacity: 0, y: 100 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.3,
-              duration: 0.8,
-              ease: "easeInOut",
-            }}
-            className="mt-8 flex flex-col items-center justify-center"
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="mt-12 scale-125"
           >
-            <div className="flex items-center gap-3 mb-8">
-              <Utensils className="h-12 w-12 text-white" />
-              <h1 className="text-7xl font-bold text-center text-white relative z-20">
-                Recify
-              </h1>
-            </div>
-            
-            <p className="mt-4 text-2xl font-light text-center text-white relative z-20">
-              {text}
-              <span className="animate-pulse">|</span>
-            </p>
+            <Logo />
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.8 }}
+            className="mt-4 text-center text-slate-400 md:text-xl"
+          >
+            {text}
+            <span className="animate-blink">|</span>
+          </motion.div>
 
-            <AceternityButton
-              onClick={() => router.push('/ingredients')}
-              className="mt-8 px-8 py-3 text-lg font-semibold hover:scale-105 transition-transform"
-            >
-              Get Started
-            </AceternityButton>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+            className="mt-8 flex flex-row gap-9 justify-center items-center"
+          >
+            <MovingBorder borderClassName="bg-[linear-gradient(to_right,#334155,#1e293b,#334155)]">
+              <AceternityButton
+                onClick={() => router.push("/ingredients")}
+                className="px-2 py-2 text-lg bg-slate-900 text-white hover:bg-slate-800"
+              >
+                Let's Get Messy!
+              </AceternityButton>
+            </MovingBorder>
+            
+            <MovingBorder borderClassName="bg-[linear-gradient(to_right,#334155,#1e293b,#334155)]">
+              <AceternityButton
+                variant="secondary"
+                onClick={scrollToFeatures}
+                className="px-2 py-2 text-lg hover:opacity-80"
+              >
+                Learn More
+              </AceternityButton>
+            </MovingBorder>
           </motion.div>
         </LampContainer>
+        
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer"
+          onClick={scrollToFeatures}
+        >
+          <div className="text-slate-400 text-sm">Scroll Down</div>
+          <div className="mt-2 text-2xl text-slate-400">↓</div>
+        </motion.div>
       </div>
-      
-      <div className="min-h-screen bg-black py-20">
+
+      {/* Features Section */}
+      <div id="features" className="min-h-screen bg-slate-950 py-20">
         <div className="container mx-auto px-4">
-          <Timeline 
-            items={timelineItems}
-            className="max-w-2xl mx-auto"
-          />
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-5xl text-center text-slate-300 mb-16"
+          >
+            Why Choose Recify?
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+              >
+                <AceternityCard className="p-6 h-full">
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold text-slate-300 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-400">{feature.description}</p>
+                </AceternityCard>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default LandingPage;

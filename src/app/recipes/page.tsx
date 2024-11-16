@@ -1,152 +1,165 @@
-'use client'
+"use client";
 
-import { Search, Utensils, Star } from "lucide-react"
-import Image from "next/image"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
+import { AceternityCard } from "@/components/ui/aceternity-card";
+import { Navbar } from "@/components/ui/navbar";
+import { Footer } from "@/components/ui/footer";
+import { useRouter } from "next/navigation";
+import { calculateHealthScore } from "@/components/ui/utils";
+import { mockRecipes } from "@/data/mokeRecipes";
+import { Logo } from "@/components/ui/logo";
+import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/app/recipes/components/scroll-areaa"
+interface Recipe {
+  _id: string;
+  title: string;
+  image_url: string;
+  ingredients: string[];
+  cuisine: string;
+  course: string;
+  diet: string;
+  prep_time: string;
+  cook_time: string;
+  total_time: string;
+  nutrition: {
+    calories: number;
+    total_fat: number;
+    saturated_fat: number;
+    sugars: number;
+    fiber: number;
+    protein: number;
+    sodium: number;
+    vitamins?: {
+      vitamin_a?: number;
+      vitamin_c?: number;
+      calcium?: number;
+      iron?: number;
+    };
+  };
+}
 
-// Sample recipe data
-const recipes = [
-  {
-    id: 1,
-    name: "Sushi Roll",
-    region: "Japan",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.5,
-    description: "Fresh fish and vegetables wrapped in seasoned rice and nori seaweed.",
-  },
-  {
-    id: 2,
-    name: "Pizza Margherita",
-    region: "Italy",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.7,
-    description: "Classic pizza with tomato sauce, fresh mozzarella, basil, and olive oil.",
-  },
-  {
-    id: 3,
-    name: "Pad Thai",
-    region: "Thailand",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.3,
-    description: "Stir-fried rice noodles with eggs, tofu, peanuts, and tangy sauce.",
-  },
-  {
-    id: 4,
-    name: "Tacos al Pastor",
-    region: "Mexico",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.6,
-    description: "Marinated pork tacos with pineapple, onions, and cilantro.",
-  },
-  {
-    id: 5,
-    name: "Butter Chicken",
-    region: "India",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.8,
-    description: "Tender chicken in a rich, creamy tomato-based curry sauce.",
-  },
-  {
-    id: 6,
-    name: "Paella",
-    region: "Spain",
-    image: "/placeholder.svg?height=200&width=300",
-    rating: 4.4,
-    description: "Saffron-flavored rice dish with various meats, seafood, and vegetables.",
-  },
-]
+const RecipesPage = () => {
+  const searchParams = useSearchParams();
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-export default function Component() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedRecipes, setSelectedRecipes] = useState<typeof recipes>([])
-  const router = useRouter()
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const ingredients = searchParams.get("ingredients");
+      if (!ingredients) {
+        setError("No ingredients selected");
+        setLoading(false);
+        return;
+      }
 
-  const filteredRecipes = recipes.filter(
-    (recipe) =>
-      recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      recipe.region.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const selectedIngredients = ingredients.toLowerCase().split(',');
+        const filteredRecipes = mockRecipes.filter(recipe => 
+          selectedIngredients.some(ingredient =>
+            recipe.ingredients.some(ri => 
+              ri.toLowerCase().includes(ingredient)
+            )
+          )
+        );
 
-  const handleRecipeClick = (recipeId: number) => {
-    router.push(`/recipe/${recipeId}`)
-  }
+        if (filteredRecipes.length === 0) {
+          setError("No recipes found with these ingredients");
+        } else {
+          setRecipes(filteredRecipes);
+        }
+      } catch (err) {
+        setError("Failed to load recipes");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <div className="container mx-auto flex h-16 items-center gap-4 px-4">
-          <Utensils className="h-6 w-6" />
-          <h1 className="text-xl font-bold">Recipe Finder</h1>
-        </div>
-      </header>
-      <div className="container mx-auto px-4 py-6">
-        <div className="mb-8">
-          <Input
-            className="max-w-xl"
-            placeholder="Search recipes by name or region..."
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredRecipes.map((recipe) => (
-              <Card
-                key={recipe.id}
-                className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg"
-                onClick={() => handleRecipeClick(recipe.id)}
-              >
-                <CardContent className="p-0">
-                  <Image
-                    alt={recipe.name}
-                    className="aspect-[4/3] object-cover transition-all duration-300 group-hover:blur-sm"
-                    height={200}
-                    src={recipe.image}
-                    width={300}
+    <div className="min-h-screen bg-gray-200 flex flex-col">
+      <Navbar />
+      <main className="flex-grow container mx-auto px-4 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="text-center mb-20 scale-125"
+          >
+            <Logo />
+            <h1 className="text-3xl md:text-4xl text-gray-800 mt-8">
+              Found Recipes
+            </h1>
+          </motion.div>
+
+          {loading ? (
+            <div className="flex justify-center items-center mt-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-800" />
+            </div>
+          ) : error ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="max-w-xl mx-auto bg-white p-8 rounded-3xl shadow-sm"
+            >
+              <p className="text-red-600 text-center">{error}</p>
+            </motion.div>
+          ) : (
+            <BentoGrid>
+              {recipes.map((recipe) => {
+                const healthScore = calculateHealthScore(recipe.nutrition);
+                return (
+                  <BentoGridItem
+                    key={recipe._id}
+                    onClick={() => router.push(`/recipes/${recipe._id}`)}
+                    header={
+                      <div className="w-full h-48 overflow-hidden rounded-xl">
+                        <img
+                          src={recipe.image_url || "/placeholder-image.jpg"}
+                          alt={`Image of ${recipe.title}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    }
+                    title={recipe.title}
+                    description={
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>{recipe.cuisine}</span>
+                          <span>{recipe.total_time}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Health Score</span>
+                          <div className={`px-3 py-1 rounded-full text-sm ${
+                            healthScore.rating === 'green' ? 'bg-green-100 text-green-600' :
+                            healthScore.rating === 'yellow' ? 'bg-yellow-100 text-yellow-600' :
+                            'bg-red-100 text-red-600'
+                          }`}>
+                            {healthScore.score}%
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {healthScore.details[0]}
+                        </div>
+                      </div>
+                    }
                   />
-                  <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <h3 className="text-lg font-semibold text-white">{recipe.name}</h3>
-                    <p className="text-sm text-gray-200">{recipe.region}</p>
-                    <p className="mt-2 text-sm text-white">{recipe.description}</p>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex items-center justify-between p-4">
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="ml-1 text-sm font-medium">{recipe.rating.toFixed(1)}</span>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-          <div className="rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-lg font-semibold">Selected Ingredients</h2>
-            <ScrollArea className="h-[calc(100vh-300px)]">
-              <div className="grid gap-4">
-                {selectedRecipes.map((recipe) => (
-                  <div
-                    key={recipe.id}
-                    className="flex items-center justify-between gap-2 rounded-lg border p-3"
-                  >
-                    <div>
-                      <p className="font-medium">{recipe.name}</p>
-                      <p className="text-sm text-gray-500">{recipe.region}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-            <Button className="mt-4 w-full">Proceed</Button>
-          </div>
+                );
+              })}
+            </BentoGrid>
+          )}
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
-  )
-}
+  );
+};
+
+export default RecipesPage;
